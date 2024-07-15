@@ -88,14 +88,14 @@ resource "aws_ami_from_instance" "catalogue" {
 resource "null_resource" "catalogue_terminate" {
   # Changes to any instance of the cluster requires re-provisioning
   triggers = {
-    instance_id = aws_ami_from_instance.catalogue.id
+    instance_id = module.catalogue.id
   }
   
   provisioner "local-exec" {
     # Bootstrap script called with private_ip of each node in the cluster
     command = "aws ec2 terminate-instances --instance-ids ${module.catalogue.id}"
     }
-    depends_on = [ aws_ami_from_instance.catalogue, null_resource.catalogue ]
+    depends_on = [ aws_ami_from_instance.catalogue ]
 }
 
 resource "aws_launch_template" "catalogue" {
