@@ -118,6 +118,16 @@ module "vpn" {
     #ingress_rule = var.mongodb_sg_ingress_rules
 }
 
+module "web_alb" {
+    source = "../../terraform-aws-security-group"
+    project_name = var.project_name
+    environment = var.environment
+    description = "SG for WEB ALB"
+    vpc_id = data.aws_ssm_parameter.vpc_id.value
+    sg_name = "web_alb"
+    #ingress_rule = var.mongodb_sg_ingress_rules
+}
+
 #openvpn
 resource "aws_security_group_rule" "vpn_yourip" {
     security_group_id = module.vpn.sg_id
@@ -128,8 +138,26 @@ resource "aws_security_group_rule" "vpn_yourip" {
     cidr_blocks = ["0.0.0.0/0"] #ideally your ip address, and static only
 }
 
+resource "aws_security_group_rule" "internet_web_alb" {
+    cidr_blocks = ["0.0.0.0/0"] #ideally your ip address, and static only
+    type              = "ingress"
+    from_port         = 443
+    to_port           = 443
+    protocol          = "-1"
+    security_group_id = module.web_alb.sg_id
+}
+
 resource "aws_security_group_rule" "app_alb_vpn" {
   source_security_group_id = module.vpn.sg_id
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = module.app_alb.sg_id
+}
+
+resource "aws_security_group_rule" "app_alb_web" {
+  source_security_group_id = module.web.sg_id
   type                     = "ingress"
   from_port                = 80
   to_port                  = 80
