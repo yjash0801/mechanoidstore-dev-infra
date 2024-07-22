@@ -25,6 +25,7 @@ module "catalogue" {
   #monitoring             = true
   vpc_security_group_ids = [data.aws_ssm_parameter.catalogue_sg_id.value]
   subnet_id              = local.private_subnet_id 
+  iam_instance_profile = "EC2RoleforShell"
 
   tags = merge(
 

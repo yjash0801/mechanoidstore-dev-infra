@@ -11,18 +11,35 @@ resource "aws_cloudfront_distribution" "mechanoidstore" {
       origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
+
+  ordered_cache_behavior {
+    path_pattern     = "/images/*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    target_origin_id = "web-${var.environment}.${var.dns}"
+
+    cache_policy_id = data.aws_cloudfront_cache_policy.cache.id
+    compress               = true
+    viewer_protocol_policy = "https-only"
+  }
+
+  ordered_cache_behavior {
+  path_pattern     = "/static/*"
+  allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+  cached_methods   = ["GET", "HEAD", "OPTIONS"]
+  target_origin_id = "web-${var.environment}.${var.dns}"
+
+  cache_policy_id = data.aws_cloudfront_cache_policy.cache.id
+  compress               = true
+  viewer_protocol_policy = "https-only"
+  }
+
   default_cache_behavior {
     allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods         = ["GET", "HEAD", "OPTIONS"]
     target_origin_id       = "web-${var.environment}.${var.dns}"
     viewer_protocol_policy = "https-only" # other options - https only, http
-    forwarded_values {
-      headers      = []
-      query_string = true
-      cookies {
-        forward = "all"
-      }
-    }
+    cache_policy_id = data.aws_cloudfront_cache_policy.no_cache.id
   }
   restrictions {
     geo_restriction {
