@@ -19,7 +19,7 @@ pipeline {
                 """
             }
         }
-        stage('Test') {
+        stage('Plan') {
             steps {
                 sh """
                     cd 01-vpc
