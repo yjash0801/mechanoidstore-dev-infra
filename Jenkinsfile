@@ -6,8 +6,8 @@ pipeline {
     }
     options {
         // Timeout counter starts AFTER agent is allocated
-        timeout(time: 1, unit: 'HOURS')
-        disableConcurrentBuilds()
+        // timeout(time: 1, unit: 'HOURS')
+        // disableConcurrentBuilds()
         ansiColor('xterm')
     }
     // build
